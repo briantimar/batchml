@@ -9,20 +9,33 @@ import json
 
 @dataclass
 class HyperParameters:
-    """ Storage class for hyperparameters."""
-
-    def __init__(self):
-        pass
+    """ Storage class for hyperparameters.
+    Parameters:
+    
+    `batch_size`: batch size used in SGD training.
+    `learning_rate`: lr used in training.
+    `epochs`: number of epochs trained."""
+    
+    batch_size: int=0
+    learning_rate: float=0.0
+    epochs: int=0
+    
     
     def json(self):
         """ JSON representation of the hyperparameter settings.
-        TODO"""
-        return {}
+        """
+        return {
+                'batch_size' : self.batch_size,
+                'learning_rate': self.learning_rate,
+                'epochs': self.epochs
+                 }
     
     @classmethod
     def from_json(cls, jsn):
-        """ Load `HyperParameters` from JSON. TODO """
-        return cls()
+        """ Load `HyperParameters` from JSON. """
+        return cls(batch_size=jsn['batch_size'],
+                    learning_rate=jsn['learning_rate'],
+                    epochs=jsn['epochs'])
 
 class Log():
     """ A log which holds data from training."""
