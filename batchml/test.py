@@ -25,11 +25,26 @@ class LogTestCase(unittest.TestCase):
         with self.assertRaises(IOError):
             log = Log(filename="test.json")
 
-
     def test_backend(self):
         from .utils import Log
         l = Log()
         self.assertEqual(l._backend, 'json')
+
+    def test_json(self):
+        from .utils import Log
+        import json
+        import os
+        import numpy as np
+
+        l = Log(id='id', training_loss=np.asarray([2.3], dtype=np.float32))
+        j = l.json()
+        for key in ('model_description', 'training_loss', 'hyperparameters'):
+            self.assertTrue(key in j.keys())
+        with open("test.json", 'w') as f:
+            json.dump(j,f)
+        os.remove("test.json")
+        
+
 
 class TrainingInstanceTestCase(unittest.TestCase):
 
