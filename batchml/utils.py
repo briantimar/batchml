@@ -18,11 +18,17 @@ class HyperParameters:
         """ JSON representation of the hyperparameter settings.
         TODO"""
         return {}
+    
+    @classmethod
+    def from_json(cls, jsn):
+        """ Load `HyperParameters` from JSON. TODO """
+        return cls()
 
 class Log():
     """ A log which holds data from training."""
 
     _DEFAULT_KEYS = ['training_loss', 'hyperparameters', 'model_description']
+    _time_fmt_string = "%Y_%m_%d__%H_%M_%S"
     
     def __init__(self, filename=None, id='', training_loss=[],hyperparameters=None, model_description=''):
         """
@@ -83,7 +89,7 @@ class Log():
     @property
     def timestamp_str(self):
         """String representation of time of creation."""
-        return self.time_of_creation.strftime("%Y_%m_%d__%H_%M_%S")
+        return self.time_of_creation.strftime(self._time_fmt_string)
 
     def json(self):
         """ Returns json representation of the current log state."""
@@ -107,5 +113,35 @@ class Log():
         with open(self.filename, 'w') as f:
             json.dump(self.json(), f)
 
+    @classmethod
+    def from_json(cls, jsn, filename=None):
+        """ Constructs `Log` from the given JSON.
+
+        Parameters:
+        `jsn`: a JSON-valid dict. Must have `model_description`, `time_of_creation`, `id`, `hyperparameters`, `training_loss` keys.
+        """
+        for key in ('model_description', 'time_of_creation', 'id', 'hyperparameters', 'training_loss'):
+            if key not in jsn.keys():
+                raise ValueError("JSON is missing key {0}".format(key))
+        hp = HyperParameters.from_json(jsn['hyperparameters'])
+        log = cls(filename=filename, 
+                    id=jsn['id'],
+                    training_loss=jsn['training_loss'],
+                    model_description=jsn['model_description'],
+                    hyperparameters=hp,
+                    )
+        log.time_of_creation = datetime.datetime.strptime(jsn['time_of_creation'], cls._time_fmt_string)
+        return log
     
-        
+    @classmethod
+    def load(cls, filename):
+        """ Attempt to load `Log` from json in the specified filename.
+        Parameters:
+
+        `filename`: path to JSON file.
+        """
+        if not os.path.exists(filename):
+            raise IOError("{0} does not exist".format(filename))
+        with open(filename) as f:
+            jsn = json.load(f)
+        return cls.from_json(jsn)

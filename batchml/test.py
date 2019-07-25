@@ -53,6 +53,18 @@ class LogTestCase(unittest.TestCase):
             self.assertEqual(j['id'], 'id')
         os.remove("test.json")
 
+    def test_from_json(self):
+        from .utils import Log
+        import datetime
+        jsn = dict(id='id', model_description='model', training_loss=[2],
+                    hyperparameters={}, 
+                   time_of_creation="2019_07_25__13_13_13")
+
+        log = Log.from_json(jsn, filename='test')
+        self.assertEqual(log.id, 'id')
+        self.assertEqual(log.training_loss, [2])
+        self.assertEqual(log.time_of_creation, 
+                            datetime.datetime(year=2019,month=7,day=25,hour=13,minute=13,second=13))
 
 class TrainingInstanceTestCase(unittest.TestCase):
 
