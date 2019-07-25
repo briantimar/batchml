@@ -50,7 +50,7 @@ class LogTestCase(unittest.TestCase):
     def test_from_json(self):
         import datetime
         jsn = dict(id='id', model_description='model', training_loss=[2],
-                    hyperparameters={'batch_size': 0, 'epochs': 0, 'learning_rate':0.0}, 
+                    hyperparameters={'batch_size': 0, 'epochs': 1, 'learning_rate':0.0}, 
                    time_of_creation="2019_07_25__13_13_13")
         
         log = Log.from_json(jsn, filename='test')
@@ -58,6 +58,7 @@ class LogTestCase(unittest.TestCase):
         self.assertEqual(log.training_loss, [2])
         self.assertEqual(log.time_of_creation, 
                             datetime.datetime(year=2019,month=7,day=25,hour=13,minute=13,second=13))
+        self.assertEqual(log.hyperparameters.epochs, 1)
 
     def test_load(self):
         l = Log(filename="test", id='id')
