@@ -10,6 +10,16 @@ class LogTestCase(unittest.TestCase):
         self.assertTrue(hasattr(l, 'hyperparameters'))
         self.assertTrue(hasattr(l, 'model_description'))
 
+    def test_filename(self):
+        from .utils import Log
+        log = Log(filename="test")
+        self.assertEqual(log.filename, "test.json")
+
+    def test_backend(self):
+        from .utils import Log
+        l = Log()
+        self.assertEqual(l._backend, 'json')
+
 class TrainingInstanceTestCase(unittest.TestCase):
 
     def test_log_existence(self):

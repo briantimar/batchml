@@ -4,6 +4,7 @@
 
 from dataclasses import dataclass
 import datetime
+import os
 
 @dataclass
 class HyperParameters:
@@ -12,41 +13,44 @@ class HyperParameters:
     def __init__(self):
         pass
 
-class Log(dict):
+class Log():
     """ A log which holds data from training."""
 
     _DEFAULT_KEYS = ['training_loss', 'hyperparameters', 'model_description']
     
-    def __init__(self, filename=None, id=None, **kwargs):
+    def __init__(self, filename=None, id=None, training_loss=[],hyperparameters=None, model_description=''):
         """
         Parameters:
 
-        `filename`: name of file where log will be written. If None, a default local filename based on timestamp of creation or id
+        `filename`: name of file where log will be written (no extension). If `None`, a default local filename based on timestamp of creation or id
         will be supplied.
-        `id`: if not None, an id to tag the log. """
-        super().__init__(**kwargs)
-        if 'training_loss' not in kwargs.keys():
-            self['training_loss'] = []
-        if 'hyperparameters' not in kwargs.keys():
-            self['hyperparameters'] = HyperParameters
-        if 'model_description' not in kwargs.keys():
-            self['model_description'] = "No description provided"
+        `id`: if not None, an id to tag the log.
+        `training_loss`: if not `None`, a list of scalar training losses.
+        `hyperparameters`: if not `None`, an instance of `HyperParameters`.
+        `model_description`: a string description of the model. """
+
+        self.training_loss = training_loss.copy()
+        self.hyperparameters = hyperparameters
+        self.model_description = model_description
 
         self.id = id
         self.time_of_creation = datetime.datetime.now()
-        if 'filename' not in kwargs.keys():
+        if filename is None:
             self._filename = self._get_default_filename()
         else:
-            self._filename = kwargs['filename']
-
-        self._check_valid_filename(self._filename)
+            self._filename = filename
+        
+        self._check_valid_filename()
         self._backend = 'json'
 
         if self._backend != 'json':
             raise NotImplementedError
 
-    def __getattr__(self, key):
-        return self[key]
+    def _check_valid_filename(self):
+        if os.path.exists(self._filename):
+            raise IOError("File {0} already exists!".format(self._filename))
+        if '.' in self._filename:
+            raise IOError("Please supply filenames without extensions.")
     
     def _get_extension(self):
         """ Extension for filename."""
@@ -56,15 +60,15 @@ class Log(dict):
     def _get_default_filename(self):
         """ Creates a default filename for the Log."""
         if self.id is not None:
-            putative_filename = "log_{0}".format(self.id)
+            filename = "log_{0}".format(self.id)
         else:
-            putative_filename = self.time_of_creation.strftime("log_%Y_%m_%d__%H_%M_%S")
+            filename = self.time_of_creation.strftime("log_%Y_%m_%d__%H_%M_%S")
+        return filename
         
-
     @property
     def filename(self):
         """Filepath to which the log will be written."""
-        return self._filename
+        return self._filename + self._get_extension()
 
     def save(self):
         """ Save the current log state as json to specified filepath."""
