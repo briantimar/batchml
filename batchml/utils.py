@@ -13,7 +13,9 @@ class HyperParameters:
     Parameters:
     
     `batch_size`: batch size used in SGD training.
+
     `learning_rate`: lr used in training.
+    
     `epochs`: number of epochs trained."""
     
     batch_size: int=0
