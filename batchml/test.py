@@ -12,8 +12,19 @@ class LogTestCase(unittest.TestCase):
 
     def test_filename(self):
         from .utils import Log
+        import os
+
         log = Log(filename="test")
         self.assertEqual(log.filename, "test.json")
+
+        with open("test.json", 'w') as f:
+            f.write("{}")
+        with self.assertRaises(IOError):
+            log = Log(filename="test")
+        os.remove("test.json")
+        with self.assertRaises(IOError):
+            log = Log(filename="test.json")
+
 
     def test_backend(self):
         from .utils import Log

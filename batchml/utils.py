@@ -40,18 +40,21 @@ class Log():
         else:
             self._filename = filename
         
-        self._check_valid_filename()
         self._backend = 'json'
-
         if self._backend != 'json':
             raise NotImplementedError
 
+        self._check_valid_filename()
+
+
+        
     def _check_valid_filename(self):
-        if os.path.exists(self._filename):
-            raise IOError("File {0} already exists!".format(self._filename))
         if '.' in self._filename:
             raise IOError("Please supply filenames without extensions.")
     
+        if os.path.exists(self.filename):
+            raise IOError("File {0} already exists!".format(self.filename))
+
     def _get_extension(self):
         """ Extension for filename."""
         extensions = {'json': '.json'}
@@ -67,7 +70,7 @@ class Log():
         
     @property
     def filename(self):
-        """Filepath to which the log will be written."""
+        """Filepath, including extension, to which the log will be written."""
         return self._filename + self._get_extension()
 
     def save(self):
