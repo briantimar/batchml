@@ -66,6 +66,15 @@ class LogTestCase(unittest.TestCase):
         self.assertEqual(log.time_of_creation, 
                             datetime.datetime(year=2019,month=7,day=25,hour=13,minute=13,second=13))
 
+    def test_load(self):
+        from .utils import Log
+        l = Log(filename="test", id='id')
+        l.save()
+        l2 = Log.load("test.json")
+        os.remove("test.json")
+        self.assertTrue(l.id==l2.id)
+        self.assertTrue(l.timestamp_str == l2.timestamp_str)
+        
 class TrainingInstanceTestCase(unittest.TestCase):
 
     def test_log_existence(self):
