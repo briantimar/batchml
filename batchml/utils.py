@@ -5,6 +5,7 @@
 from dataclasses import dataclass
 import datetime
 import os
+import json
 
 @dataclass
 class HyperParameters:
@@ -95,7 +96,16 @@ class Log():
                     )
         return _json
 
+    def save(self, no_overwrite=False):
+        """ Save the current log state as json to the log's filepath.
+            Parameters:
 
-    def save(self):
-        """ Save the current log state as json to specified filepath."""
-        pass
+            `no_overwrite`: if `True`, raises `IOError` if the `Log`'s filename already exists."""
+
+        if no_overwrite and os.path.exists(self.filename):
+            raise IOError("Filename {0} exists.".format(self.filename))
+        with open(self.filename, 'w') as f:
+            json.dump(self.json(), f)
+
+    
+        

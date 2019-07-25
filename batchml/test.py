@@ -1,4 +1,7 @@
 import unittest
+import os
+import json
+
 
 class LogTestCase(unittest.TestCase):
 
@@ -12,7 +15,6 @@ class LogTestCase(unittest.TestCase):
 
     def test_filename(self):
         from .utils import Log
-        import os
 
         log = Log(filename="test")
         self.assertEqual(log.filename, "test.json")
@@ -32,8 +34,6 @@ class LogTestCase(unittest.TestCase):
 
     def test_json(self):
         from .utils import Log
-        import json
-        import os
         import numpy as np
 
         l = Log(id='id', training_loss=np.asarray([2.3], dtype=np.float32))
@@ -44,6 +44,14 @@ class LogTestCase(unittest.TestCase):
             json.dump(j,f)
         os.remove("test.json")
         
+    def test_save(self):
+        from .utils import Log
+        l = Log(id='id', filename="test")
+        l.save()
+        with open(l.filename) as f:
+            j = json.load(f)
+            self.assertEqual(j['id'], 'id')
+        os.remove("test.json")
 
 
 class TrainingInstanceTestCase(unittest.TestCase):
